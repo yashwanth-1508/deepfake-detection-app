@@ -70,7 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
         ? 'http://localhost:8000/detect' 
-        : '/detect'; // Use relative path if hosted on the same domain, or update this to your hosted backend URL
+        : 'https://deepfake-detection-app-production.up.railway.app/detect'; 
+
 
     
     fileInput.addEventListener('change', (e) => {
