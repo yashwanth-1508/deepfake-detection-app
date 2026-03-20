@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+env/
+.env
+
+# Large Datasets
+kaggle_data/
+multiface_data/
+multiface_training_data/
+*.mp4
+*.zip
+*.tar.gz
+
+# Model Weights (keeping only the essentials)
+# Note: GitHub has a 100MB file limit. 
+# model/weights/model.pth is ~87MB, so it's okay.
+# model/weights/fine_tuned_head.pth is ~21MB, so it's okay.
+# We exclude other versions to save space.
+model/weights/model_v*.pth
+model/weights/pytorchcv-*.whl
+
+# IDE / System
+.DS_Store
+.vscode/
+.idea/
+.git/
+node_modules/
+dist/
+build/

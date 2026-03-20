@@ -1,0 +1,30 @@
+# Exclude virtual environment
+venv/
+.venv/
+env/
+
+# Exclude Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Exclude large datasets and raw data
+kaggle_data/
+multiface_data/
+multiface_training_data/
+*.mp4
+*.zip
+
+# Exclude IDE and system files
+.DS_Store
+.vscode/
+.idea/
+.git/
+
+# Exclude model weights that we don't need (keeping only the relevant ones)
+# Note: Dockerfile copies the whole project, so we might want to be selective 
+# if we have many versions of weights. 
+# For now, we keep the weights directory but exclude specific unused large files if needed.
+model/weights/model_v*.pth
+model/weights/pytorchcv*.whl

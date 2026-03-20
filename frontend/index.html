@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRUTH LENSE AI | Neural Truth Verification</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div class="site-wrapper">
+        <div class="site-overlay"></div>
+
+        <nav>
+            <div class="logo">TRUTH<span>LENSE</span></div>
+            <div class="nav-links">
+                <a href="#" class="active" data-section="home">Home</a>
+                <a href="#" data-section="about">About</a>
+                <a href="#" data-section="how">How It Works</a>
+                <a href="#" data-section="detection">Detection</a>
+                <a href="#" data-section="login">Login</a>
+                <a href="#" class="btn-get-started" data-section="detection">Get Started</a>
+            </div>
+        </nav>
+
+        <div class="content-layer">
+            <!-- Home / Hero Section -->
+            <section id="home-section" class="section">
+                <div class="hero-content">
+                    <h1>Protect the <span class="blue">Truth</span><br>Detect the <span class="blue">Fake</span></h1>
+                    <p class="hero-description">
+                        AI-powered deepfake detection that analyzes neural artifacts in real-time.
+                        Ensure authenticity, fight misinformation, and stay one step ahead of deception.
+                    </p>
+                    <div class="hero-buttons">
+                        <button class="btn-primary" onclick="showSection('detection')">Start Detection</button>
+                        <button class="btn-outline" onclick="showSection('login')">Login</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Login Section -->
+            <section id="login-section" class="section">
+                <div class="login-card">
+                    <h2>SECURE LOGIN</h2>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label>Identity Token (Email)</label>
+                            <input type="email" placeholder="user@truthlense.ai" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Access Code</label>
+                            <input type="password" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Authorize Access</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Detection Section (Dashboard) -->
+            <section id="detection-section" class="section">
+                <div class="scanner-container-v2" id="scanner-box">
+                    <h3 style="font-family: 'Orbitron'; margin-bottom: 20px; letter-spacing: 2px;">NEURAL SCANNER</h3>
+
+                    <div class="upload-area" id="drop-area" onclick="document.getElementById('file-input').click()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <p>Upload Neural Evidence</p>
+                        <span style="font-size: 11px; color: rgba(255,255,255,0.3);">Support for JPG, PNG, MP4</span>
+                        <input type="file" id="file-input" accept="image/*,video/*">
+                    </div>
+
+                    <div id="file-name" style="color: var(--accent); margin-bottom: 20px; font-size: 14px;"></div>
+
+                    <button id="detect-btn" class="btn-primary" style="width: 100%;" disabled>Initialize Scan</button>
+
+                    <div id="loading" style="margin-top: 20px; display: none;">
+                        <div class="scanner-bar-v2" style="display: block;">
+                            <div class="scanner-fill"></div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--accent); margin-top: 10px; letter-spacing: 2px;">
+                            ANALYZING NEURAL ARTIFACTS...</div>
+                    </div>
+
+                    <div id="result" class="result-card">
+                        <div style="font-size: 12px; letter-spacing: 2px; opacity: 0.7; margin-bottom: 8px;">DETECTION
+                            RESULT</div>
+                        <div id="prediction-text"
+                            style="font-family: 'Orbitron'; font-size: 24px; margin-bottom: 12px;">---</div>
+                        <div
+                            style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                            <div id="confidence-bar" style="height:100%; width:0%; transition: width 0.8s ease-out;">
+                            </div>
+                        </div>
+                        <div id="confidence-text" style="font-size: 12px; color: var(--text-dim); margin-top: 8px;">
+                            Confidence: 0%</div>
+                        
+                        <!-- Neural Evidence Heatmap (Aggregated or multi) -->
+                        <div id="faces-list" style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; display: none;">
+                            <div style="font-size: 10px; color: var(--accent); margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase;">Detected Individuals</div>
+                            <div id="faces-container" style="display: flex; flex-direction: column; gap: 15px;">
+                                <!-- Each face will be injected here -->
+                            </div>
+                        </div>
+
+                        <div id="heatmap-container" style="margin-top: 20px; display: none;">
+                            <div style="font-size: 10px; color: var(--accent); margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase;">Primary Feature Heatmap</div>
+                            <img id="heatmap-img" src="" alt="Neural Evidence" style="width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
