@@ -22,9 +22,11 @@ multiface_training_data/
 .idea/
 .git/
 
-# Exclude model weights that we don't need (keeping only the relevant ones)
-# Note: Dockerfile copies the whole project, so we might want to be selective 
-# if we have many versions of weights. 
-# For now, we keep the weights directory but exclude specific unused large files if needed.
-model/weights/model_v*.pth
-model/weights/pytorchcv*.whl
+# Only keep the specific weights we need
+model/weights/*
+!model/weights/model.pth
+!model/weights/fine_tuned_head.pth
+!model/weights/efficientnetb4_b0.pth
+!model/weights/__init__.py
+!model/weights/face_detector/*
+
