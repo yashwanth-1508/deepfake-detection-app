@@ -44,7 +44,7 @@ async def detect_deepfake(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="Could not extract frames from video")
             
         # The detector now handles multiple faces and returns a list of individual results
-        result = detector.predict_with_explainability(frames)
+        result = detector.predict_robust(frames)
         return result
         
     elif content_type and content_type.startswith('image'):
@@ -54,7 +54,7 @@ async def detect_deepfake(file: UploadFile = File(...)):
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Invalid image file: {str(e)}")
             
-        result = detector.predict_with_explainability(image)
+        result = detector.predict_robust(image)
         return result
         
     else:

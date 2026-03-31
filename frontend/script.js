@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const confidenceBar = document.getElementById('confidence-bar');
     const confidenceText = document.getElementById('confidence-text');
     
-    const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    const API_URL = (window.location.hostname === 'localhost' || window.location.hostname.startsWith('127.') || window.location.hostname === '[::]' || window.location.hostname === '::1')
         ? 'http://localhost:8000/detect' 
         : 'https://deepfake-detection-app-production.up.railway.app/detect'; 
 
@@ -127,21 +127,42 @@ document.addEventListener('DOMContentLoaded', () => {
             predictionText.textContent = data.prediction;
             confidenceText.textContent = `Confidence: ${confidencePercent}%`;
             
+            // Apply Dynamic Styling based on the prediction tier
+            let statusClass = 'undetermined';
+            let statusColor = 'var(--neutral)';
+            
             if (data.prediction === 'Real') {
-                resultDiv.className = 'result-card real';
-                predictionText.style.color = 'var(--real)';
-                confidenceBar.style.backgroundColor = 'var(--real)';
-            } else {
-                resultDiv.className = 'result-card deepfake';
-                predictionText.style.color = 'var(--fake)';
-                confidenceBar.style.backgroundColor = 'var(--fake)';
+                statusClass = 'real';
+                statusColor = 'var(--real)';
+            } else if (data.prediction === 'Likely Real') {
+                statusClass = 'likely-real';
+                statusColor = 'var(--warn)';
+            } else if (data.prediction === 'Deepfake') {
+                statusClass = 'deepfake';
+                statusColor = 'var(--fake)';
+            } else if (data.prediction.includes('Undetermined')) {
+                statusClass = 'undetermined';
+                statusColor = 'var(--neutral)';
             }
+            
+            resultDiv.className = `result-card ${statusClass}`;
+            predictionText.style.color = statusColor;
+            confidenceBar.style.backgroundColor = statusColor;
             
             setTimeout(() => {
                 confidenceBar.style.width = `${confidencePercent}%`;
+                
+                // Animate Neon Pie Chart
+                const pieChart = document.getElementById('neural-pie');
+                const pieLabel = document.querySelector('.pie-label');
+                if (pieChart) {
+                    const deg = (data.confidence * 360).toFixed(0);
+                    pieChart.style.background = `conic-gradient(${statusColor} ${deg}deg, rgba(255, 255, 255, 0.05) 0%)`;
+                    if(pieLabel) pieLabel.textContent = data.prediction === 'Real' ? 'REAL' : 'FAKE';
+                }
             }, 100);
 
-            // Handle Multi-Face Details
+            // Handle Multi-Face Details (Frames Grid)
             const facesList = document.getElementById('faces-list');
             const facesContainer = document.getElementById('faces-container');
             const heatmapContainer = document.getElementById('heatmap-container');
@@ -151,21 +172,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.faces && data.faces.length > 0) {
                 facesList.style.display = 'block';
-                data.faces.forEach((face, idx) => {
+                // Take up to 6 faces to fit the grid nicely
+                const displayFaces = data.faces.slice(0, 8);
+                displayFaces.forEach((face) => {
                     const faceItem = document.createElement('div');
-                    faceItem.style.background = 'rgba(255,255,255,0.03)';
-                    faceItem.style.padding = '12px';
-                    faceItem.style.borderLeft = `3px solid ${face.prediction === 'Real' ? 'var(--accent)' : 'var(--danger)'}`;
-                    faceItem.style.display = 'flex';
-                    faceItem.style.justifyContent = 'space-between';
-                    faceItem.style.alignItems = 'center';
+                    faceItem.className = 'frame-item';
                     
+                    const fColor = face.prediction === 'Real' ? 'var(--real)' : 'var(--fake)';
+                    
+                    // We use the heatmap thumbnail as the visual
                     faceItem.innerHTML = `
-                        <div>
-                            <div style="font-size: 12px; font-weight: bold; color: ${face.prediction === 'Real' ? 'var(--text-bright)' : 'var(--danger)'}">Person ${idx + 1}: ${face.prediction}</div>
-                            <div style="font-size: 10px; color: var(--text-dim)">Confidence: ${(face.confidence * 100).toFixed(1)}%</div>
+                        <img src="data:image/jpeg;base64,${face.heatmap}" class="frame-thumbnail" onclick="showHeatmap('${face.heatmap}')" style="cursor: pointer;" alt="Analyzed Target">
+                        <div class="frame-score" style="color: ${fColor}">
+                            ${(face.confidence * 100).toFixed(0)}% ${face.prediction.substring(0, 1)}
                         </div>
-                        <button onclick="showHeatmap('${face.heatmap}')" style="background: var(--bg-card); border: 1px solid var(--accent); color: var(--accent); font-size: 9px; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Show Evidence</button>
                     `;
                     facesContainer.appendChild(faceItem);
                 });

@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
 import pandas as pd
 from PIL import Image
 import os
@@ -47,10 +48,22 @@ class VideoDataset(Dataset):
             
         # Process frames through CNN to get features
         sequence_tensors = []
+        
+        # Define Robust Augmentations (Simulate real-world noise)
+        augment = transforms.Compose([
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+            transforms.RandomAdjustSharpness(sharpness_factor=2, p=0.3),
+            transforms.GaussianBlur(kernel_size=(3, 3), sigma=(0.1, 1.0)),
+        ])
+
         for frame in frames:
-            # Re-use detector facial crop and transform
+            # Re-use detector facial crop
             face_crops = self.detector.get_all_face_crops(frame)
             face = face_crops[0] if face_crops else frame
+            
+            # Apply Augmentations during training
+            face = augment(face)
             
             img_t = self.detector.transform(face)
             sequence_tensors.append(img_t)

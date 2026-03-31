@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torchvision import transforms
-from PIL import Image, ImageEnhance, ImageFilter
+from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 import ssl
 import os
 import cv2
@@ -81,14 +81,24 @@ class DeepfakeDetector:
             except Exception as e:
                 print(f"Error loading base weights: {e}")
 
-        # 2. OVERRIDE with fine-tuned head weights if available
+        # 2. OVERRIDE with fine-tuned weights if available
+        # ALIGHTED FOR PRODUCTION: Re-enabling fine-tuned weights with corrected mapping.
+        fine_tuned_base_path = os.path.join(os.path.dirname(__file__), 'weights', 'fine_tuned_base.pth')
+        if os.path.exists(fine_tuned_base_path):
+            try:
+                base_state = torch.load(fine_tuned_base_path, map_location=self.device)
+                self.base_model.load_state_dict(base_state, strict=True)
+                print(f"SUCCESS: Loaded fine-tuned BASE weights from {fine_tuned_base_path}")
+            except Exception as e:
+                print(f"Warning: Could not load fine-tuned base weights: {e}")
+
         if os.path.exists(fine_tuned_path):
             try:
                 fine_tuned_state = torch.load(fine_tuned_path, map_location=self.device)
                 self.head.load_state_dict(fine_tuned_state, strict=True)
-                print(f"SUCCESS: Loaded fine-tuned weights from {fine_tuned_path}")
+                print(f"SUCCESS: Loaded fine-tuned HEAD weights from {fine_tuned_path}")
             except Exception as e:
-                print(f"Warning: Could not load fine-tuned weights: {e}")
+                print(f"Warning: Could not load fine-tuned head weights: {e}")
         
         # Load OpenCV DNN Face Detector
         proto_path = os.path.join(os.path.dirname(__file__), 'face_detector', 'deploy.prototxt')
@@ -101,6 +111,17 @@ class DeepfakeDetector:
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])
+
+    def classify_probability(self, prob):
+        """
+        PRODUCTION MAPPING: 0.51 Threshold (Tuned for Global Stability)
+        """
+        print(f"CALIBRATION: Raw Average = {prob:.4f}")
+        # Threshold 0.51: Precision split for live browser samples
+        if prob > 0.51:
+            return "Real", prob
+        else:
+            return "Deepfake", 1.0 - prob
 
     def get_all_face_crops(self, image_pil):
         # Convert PIL to BGR for OpenCV
@@ -233,84 +254,90 @@ class DeepfakeDetector:
                 with torch.no_grad():
                     cnn_features = self.base_model(batch_t)
                     cnn_features = cnn_features.view(cnn_features.size(0), -1)
-                    flow_t = torch.tensor([[item['flow']]], device=self.device, dtype=torch.float32)
-                    combined = torch.cat([cnn_features, flow_t], dim=1)
+                    # SYNC WITH TRAINING: Use zeroed flow features (matches train.py line 121)
+                    flow_feat = torch.zeros((1, 1)).to(self.device)
+                    combined = torch.cat([cnn_features, flow_feat], dim=1)
                     sequence_features.append(combined)
 
             sequence_t = torch.stack(sequence_features, dim=1)
             with torch.no_grad():
                 prob = self.head(sequence_t).item()
             
-            prediction = "Deepfake" if prob < 0.5 else "Real"
-            confidence = 1 - prob if prob < 0.5 else prob
+            prediction, confidence = self.classify_probability(prob)
             
             results.append({
                 "face_id": int(tid),
                 "prediction": prediction,
                 "confidence": float(confidence),
+                "raw_prob": float(prob),
                 "box": [int(x) for x in track['last_box']],
                 "last_face_pil": track['face_crops'][-1]['pil']
             })
 
-        # Final Aggregation
-        if not results:
-            return { "prediction": "No Faces Detected", "confidence": 0.0, "faces": [] }
-            
-        # If ANY face is deepfake, the video is flagged
-        is_deepfake = any(r['prediction'] == "Deepfake" for r in results)
-        max_confidence = max(r['confidence'] for r in results)
+        # Global result logic:
+        predictions = [r['prediction'] for r in results]
+        
+        # Aggregation Logic: Priority Order
+        if "Deepfake" in predictions:
+            global_pred = "Deepfake"
+        elif "Undetermined / Potential Deepfake" in predictions:
+            global_pred = "Undetermined / Potential Deepfake"
+        elif "Likely Real" in predictions:
+            global_pred = "Likely Real"
+        else:
+            global_pred = "Real"
+
+        max_confidence = max([r['confidence'] for r in results] or [0.0])
         
         return {
-            "prediction": "Deepfake" if is_deepfake else "Real",
+            "prediction": global_pred,
             "confidence": max_confidence,
             "faces": results
         }
 
-    def predict_robust(self, inputs, num_augments=3):
+    def predict_robust(self, inputs, num_augments=1):
         """
-        Runs prediction with Inference-Time Augmentation (ITA) for improved robustness.
-        Averages predictions from original and slightly augmented versions of the input.
+        Runs prediction with Fast Inference-Time Augmentation (ITA).
+        Scans both Original and Flipped images to stabilize the prediction.
         """
-        # Original prediction
-        orig_res = self.predict(inputs)
-        all_probs = [orig_res['confidence'] if orig_res['prediction'] == "Real" else 1 - orig_res['confidence']]
-        
-        # Augmented predictions
+        # 1. Original Scan
+        res = self.predict_with_explainability(inputs)
+        if "faces" not in res or not res["faces"]:
+            return res
+
         if isinstance(inputs, Image.Image):
             frames = [inputs]
         else:
             frames = inputs
-            
-        for _ in range(num_augments):
-            # Apply light random augmentations (blur, brightness) to the whole sequence
-            aug_frames = []
-            for frame in frames:
-                # Random brightness
-                enhancer = ImageEnhance.Brightness(frame)
-                aug_frame = enhancer.enhance(np.random.uniform(0.8, 1.2))
-                # Random blur
-                if np.random.rand() > 0.5:
-                    aug_frame = aug_frame.filter(ImageFilter.GaussianBlur(radius=np.random.uniform(0, 1)))
-                aug_frames.append(aug_frame)
-            
-            res = self.predict(aug_frames)
-            prob = res['confidence'] if res['prediction'] == "Real" else 1 - res['confidence']
-            all_probs.append(prob)
-            
-        avg_prob = np.mean(all_probs)
+
+        # 2. Add Horizontal Flip Scan
+        flipped_frames = [ImageOps.mirror(f) for f in (frames if isinstance(frames, list) else [frames])]
+        aug_res = self.predict(flipped_frames)
         
-        if avg_prob < 0.5:
-            prediction = "Deepfake"
-            confidence = 1 - avg_prob
-        else:
-            prediction = "Real"
-            confidence = avg_prob
+        # 3. Average the scores
+        for i, face_orig in enumerate(res["faces"]):
+            # Get raw prob from original
+            p_orig = face_orig.get("raw_prob", 0.5)
             
-        return {
-            "prediction": prediction,
-            "confidence": confidence,
-            "robust_score": True
-        }
+            # Match with flipped scan (simple index match for single-face, or logic for multi)
+            if "faces" in aug_res and i < len(aug_res["faces"]):
+                p_aug = aug_res["faces"][i].get("raw_prob", 0.5)
+                # Average the two views for consistency
+                final_prob = (p_orig + p_aug) / 2.0
+            else:
+                final_prob = p_orig
+            
+            # Final Classification on the average
+            pred, conf = self.classify_probability(final_prob)
+            face_orig["prediction"] = pred
+            face_orig["confidence"] = conf
+            face_orig["raw_prob"] = final_prob
+
+        # Update global results after averaging
+        all_preds = [f["prediction"] for f in res["faces"]]
+        res["prediction"] = "Deepfake" if "Deepfake" in all_preds else "Real"
+        res["confidence"] = max([f["confidence"] for f in res["faces"]] or [0.0])
+        return res
     def generate_gradcam(self, face_pil):
         """
         Generates a Grad-CAM heatmap for a single face image.
