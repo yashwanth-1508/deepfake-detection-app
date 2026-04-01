@@ -349,68 +349,38 @@ class DeepfakeDetector:
 
         # 1. Prepare input
         input_tensor = self.transform(face_pil).unsqueeze(0).to(self.device)
-        input_tensor.requires_grad = True
-
-        # 2. Hooks to capture activations and gradients
-        # In Xception from pytorchcv, the last convolutional layer is usually in the last block of 'features'
-        # Let's target the last block in the base_model (which is features)
-        target_layer = self.base_model[-1]
         
-        feature_maps = []
-        gradients = []
+        # RAM OPTIMIZATION: Removed requires_grad=True and backward() to prevent OOM
+        # on the 512MB Vercel/Railway backend. Since score = features.mean(), weight is 
+        # identical across fmaps. We can just mean the fmaps directly.
 
-        def forward_hook(module, input, output):
-            feature_maps.append(output)
-
-        def backward_hook(module, grad_input, grad_output):
-            gradients.append(grad_output[0])
-
-        f_hook = target_layer.register_forward_hook(forward_hook)
-        b_hook = target_layer.register_full_backward_hook(backward_hook)
-
-        # 3. Forward pass through CNN
-        self.base_model.zero_grad()
-        features = self.base_model(input_tensor)
-        features_flat = features.view(features.size(0), -1)
+        # 2. Forward pass through CNN
+        with torch.no_grad():
+            features = self.base_model(input_tensor)
         
-        # We need a scalar to backprop from. We'll use the mean of the features 
-        # as a proxy for the 'class score' before the LSTM/Linear head.
-        score = features_flat.mean()
-        
-        # 4. Backward pass
-        score.backward()
+        # 3. Compute Activation Map (Equivalent to Grad-CAM for global mean)
+        fmaps = features.cpu().numpy()[0]
+        cam = np.mean(fmaps, axis=0) # Average across channels
 
-        # 5. Compute Grad-CAM
-        grads = gradients[0].cpu().data.numpy()
-        fmaps = feature_maps[0].cpu().data.numpy()
-        
-        weights = np.mean(grads, axis=(2, 3))[0]
-        cam = np.zeros(fmaps.shape[2:], dtype=np.float32)
-
-        for i, w in enumerate(weights):
-            cam += w * fmaps[0, i, :, :]
-
+        # 4. Normalize
         cam = np.maximum(cam, 0)
         cam = cv2.resize(cam, (299, 299))
-        cam = cam - np.min(cam)
-        cam = cam / np.max(cam)
+        if np.max(cam) != np.min(cam):
+            cam = cam - np.min(cam)
+            cam = cam / np.max(cam)
 
-        # 6. Create Visualizations
+        # 5. Create Visualizations
         img = np.array(face_pil.resize((299, 299)))
         heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
         heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
         
         overlay = cv2.addWeighted(img, 0.6, heatmap, 0.4, 0)
         
-        # 7. Convert to base64
+        # 6. Convert to base64
         overlay_pil = Image.fromarray(overlay)
         buffered = BytesIO()
         overlay_pil.save(buffered, format="JPEG")
         img_str = base64.b64encode(buffered.getvalue()).decode()
-
-        # Clean up hooks
-        f_hook.remove()
-        b_hook.remove()
 
         return img_str
 
