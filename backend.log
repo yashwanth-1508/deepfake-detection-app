@@ -44,3 +44,19 @@ INFO:     Finished server process [2451]
 INFO:     Started server process [3396]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+Using device: mps
+Loaded base weights from /Users/yashwanthgaddam/Desktop/deepfake-project/model/weights/model.pth
+SUCCESS: Loaded fine-tuned BASE weights from /Users/yashwanthgaddam/Desktop/deepfake-project/model/weights/fine_tuned_base.pth
+SUCCESS: Loaded fine-tuned HEAD weights from /Users/yashwanthgaddam/Desktop/deepfake-project/model/weights/fine_tuned_head.pth
+CALIBRATION: Raw Average = 0.7567
+CALIBRATION: Raw Average = 0.8304
+CALIBRATION: Raw Average = 0.7936
+INFO:     127.0.0.1:49825 - "POST /detect HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'model/model.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3396]
+INFO:     Started server process [4009]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

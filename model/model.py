@@ -61,7 +61,7 @@ class DeepfakeDetector:
         # 1. Load base model weights if available
         if os.path.exists(weights_path):
             try:
-                state_dict = torch.load(weights_path, map_location=self.device)
+                state_dict = torch.load(weights_path, map_location=self.device, mmap=True)
                 if isinstance(state_dict, dict) and 'state_dict' in state_dict:
                     state_dict = state_dict['state_dict']
                 
@@ -86,7 +86,7 @@ class DeepfakeDetector:
         fine_tuned_base_path = os.path.join(os.path.dirname(__file__), 'weights', 'fine_tuned_base.pth')
         if os.path.exists(fine_tuned_base_path):
             try:
-                base_state = torch.load(fine_tuned_base_path, map_location=self.device)
+                base_state = torch.load(fine_tuned_base_path, map_location=self.device, mmap=True)
                 self.base_model.load_state_dict(base_state, strict=True)
                 print(f"SUCCESS: Loaded fine-tuned BASE weights from {fine_tuned_base_path}")
             except Exception as e:
@@ -94,7 +94,7 @@ class DeepfakeDetector:
 
         if os.path.exists(fine_tuned_path):
             try:
-                fine_tuned_state = torch.load(fine_tuned_path, map_location=self.device)
+                fine_tuned_state = torch.load(fine_tuned_path, map_location=self.device, mmap=True)
                 self.head.load_state_dict(fine_tuned_state, strict=True)
                 print(f"SUCCESS: Loaded fine-tuned HEAD weights from {fine_tuned_path}")
             except Exception as e:
@@ -358,9 +358,9 @@ class DeepfakeDetector:
         with torch.no_grad():
             features = self.base_model(input_tensor)
         
-        # 3. Compute Activation Map (Equivalent to Grad-CAM for global mean)
-        fmaps = features.cpu().numpy()[0]
-        cam = np.mean(fmaps, axis=0) # Average across channels
+        # Average across channels. Slice off the bottom row to remove CNN padding noise artifacts.
+        fmaps = features.cpu().numpy()[0, :, :-1, :]
+        cam = np.mean(fmaps, axis=0)
 
         # 4. Normalize
         cam = np.maximum(cam, 0)
