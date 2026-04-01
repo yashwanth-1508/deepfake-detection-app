@@ -125,7 +125,7 @@ class DeepfakeDetector:
 
     def get_all_face_crops(self, image_pil):
         # Convert PIL to BGR for OpenCV
-        cv_image = cv2.cvtColor(np.array(image_pil), cv2.COLOR_RGB2BGR)
+        cv_image = cv2.cvtColor(np.ascontiguousarray(np.array(image_pil)), cv2.COLOR_RGB2BGR)
         (h, w) = cv_image.shape[:2]
         
         # Prepare blob for face detection
@@ -149,7 +149,7 @@ class DeepfakeDetector:
                 x2 = min(w, endX + pad_w)
                 y2 = min(h, endY + pad_h)
                 
-                face_img = cv_image[y1:y2, x1:x2]
+                face_img = np.ascontiguousarray(cv_image[y1:y2, x1:x2])
                 if face_img.size > 0:
                     face_crops.append(Image.fromarray(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB)))
             
@@ -170,7 +170,7 @@ class DeepfakeDetector:
         
         for frame_idx, frame in enumerate(frames):
             # 1. Detect all faces in the frame
-            cv_image = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
+            cv_image = cv2.cvtColor(np.ascontiguousarray(np.array(frame)), cv2.COLOR_RGB2BGR)
             (h, w) = cv_image.shape[:2]
             blob = cv2.dnn.blobFromImage(cv2.resize(cv_image, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0))
             self.face_net.setInput(blob)
@@ -188,7 +188,7 @@ class DeepfakeDetector:
                     pad_h = int((endY - startY) * 0.25)
                     x1, y1, x2, y2 = max(0, startX-pad_w), max(0, startY-pad_h), min(w, endX+pad_w), min(h, endY+pad_h)
                     
-                    face_img = cv_image[y1:y2, x1:x2]
+                    face_img = np.ascontiguousarray(cv_image[y1:y2, x1:x2])
                     if face_img.size > 0:
                         face_pil = Image.fromarray(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB))
                         current_frame_faces.append({
