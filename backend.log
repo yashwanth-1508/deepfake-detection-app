@@ -60,3 +60,19 @@ INFO:     Finished server process [3396]
 INFO:     Started server process [4009]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'model/model.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [4009]
+INFO:     Started server process [4457]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'model/model.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [4457]
+INFO:     Started server process [4863]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

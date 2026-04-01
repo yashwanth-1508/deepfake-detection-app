@@ -61,7 +61,7 @@ class DeepfakeDetector:
         # 1. Load base model weights if available
         if os.path.exists(weights_path):
             try:
-                state_dict = torch.load(weights_path, map_location=self.device, mmap=True)
+                state_dict = torch.load(weights_path, map_location=self.device)
                 if isinstance(state_dict, dict) and 'state_dict' in state_dict:
                     state_dict = state_dict['state_dict']
                 
@@ -86,7 +86,7 @@ class DeepfakeDetector:
         fine_tuned_base_path = os.path.join(os.path.dirname(__file__), 'weights', 'fine_tuned_base.pth')
         if os.path.exists(fine_tuned_base_path):
             try:
-                base_state = torch.load(fine_tuned_base_path, map_location=self.device, mmap=True)
+                base_state = torch.load(fine_tuned_base_path, map_location=self.device)
                 self.base_model.load_state_dict(base_state, strict=True)
                 print(f"SUCCESS: Loaded fine-tuned BASE weights from {fine_tuned_base_path}")
             except Exception as e:
@@ -94,7 +94,7 @@ class DeepfakeDetector:
 
         if os.path.exists(fine_tuned_path):
             try:
-                fine_tuned_state = torch.load(fine_tuned_path, map_location=self.device, mmap=True)
+                fine_tuned_state = torch.load(fine_tuned_path, map_location=self.device)
                 self.head.load_state_dict(fine_tuned_state, strict=True)
                 print(f"SUCCESS: Loaded fine-tuned HEAD weights from {fine_tuned_path}")
             except Exception as e:
@@ -354,12 +354,26 @@ class DeepfakeDetector:
         # on the 512MB Vercel/Railway backend. Since score = features.mean(), weight is 
         # identical across fmaps. We can just mean the fmaps directly.
 
-        # 2. Forward pass through CNN
-        with torch.no_grad():
-            features = self.base_model(input_tensor)
+        target_layer = self.base_model[-1]
         
-        # Average across channels. Slice off the bottom row to remove CNN padding noise artifacts.
-        fmaps = features.cpu().numpy()[0, :, :-1, :]
+        feature_maps = []
+        def forward_hook(module, input, output):
+            feature_maps.append(output)
+            
+        f_hook = target_layer.register_forward_hook(forward_hook)
+
+        # 2. Forward pass through CNN without gradients
+        with torch.no_grad():
+            self.base_model(input_tensor)
+            
+        f_hook.remove()
+        
+        # 3. Compute Activation Map 
+        fmaps = feature_maps[0].cpu().numpy()[0]
+        # Slice off the bottom row to remove CNN padding noise, but only if spatial dims exist
+        if fmaps.shape[1] > 1:
+            fmaps = fmaps[:, :-1, :]
+            
         cam = np.mean(fmaps, axis=0)
 
         # 4. Normalize
@@ -398,10 +412,12 @@ class DeepfakeDetector:
                 # Generate heatmap for the last crop of this face track
                 heatmap_b64 = self.generate_gradcam(face_res["last_face_pil"])
                 face_res["heatmap"] = heatmap_b64
-                # Clean up for JSON
-                del face_res["last_face_pil"]
             except Exception as e:
                 print(f"Grad-CAM error for face {face_res['face_id']}: {e}")
                 face_res["heatmap"] = None
+            finally:
+                # Always clean up for JSON serialization
+                if "last_face_pil" in face_res:
+                    del face_res["last_face_pil"]
             
         return res
