@@ -282,15 +282,17 @@ class DeepfakeDetector:
         # Global result logic:
         predictions = [r['prediction'] for r in results]
         
-        # Aggregation Logic: Priority Order
+        # Aggregation Logic: Priority Order (Deepfake > Undetermined > Likely Real > Real)
         if "Deepfake" in predictions:
             global_pred = "Deepfake"
         elif "Undetermined / Potential Deepfake" in predictions:
             global_pred = "Undetermined / Potential Deepfake"
         elif "Likely Real" in predictions:
             global_pred = "Likely Real"
-        else:
+        elif "Real" in predictions:
             global_pred = "Real"
+        else:
+            global_pred = "Undetermined / No Face" # Fallback if no faces detected
 
         max_confidence = max([r['confidence'] for r in results] or [0.0])
         
@@ -340,7 +342,15 @@ class DeepfakeDetector:
 
         # Update global results after averaging
         all_preds = [f["prediction"] for f in res["faces"]]
-        res["prediction"] = "Deepfake" if "Deepfake" in all_preds else "Real"
+        if "Deepfake" in all_preds:
+            res["prediction"] = "Deepfake"
+        elif "Undetermined / Potential Deepfake" in all_preds:
+            res["prediction"] = "Undetermined / Potential Deepfake"
+        elif "Likely Real" in all_preds:
+            res["prediction"] = "Likely Real"
+        else:
+            res["prediction"] = "Real"
+
         res["confidence"] = max([f["confidence"] for f in res["faces"]] or [0.0])
         return res
     def generate_gradcam(self, face_pil):
@@ -432,7 +442,7 @@ class DeepfakeDetector:
         top_zone = sorted_zones[0][0] if sorted_zones else "face"
         threshold = 0.45
 
-        # ── Zone → explanation mapping ─────────────────────────────────────────
+        # ── Zone → explanation mapping (Deepfake) ──────────────────────────────
         zone_explanations = {
             "forehead":    "Unnatural texture blending detected in the forehead region",
             "eye_region":  "Eye region shows facial blending artifacts — a hallmark of GAN generation",
@@ -443,8 +453,21 @@ class DeepfakeDetector:
             "skin_texture":"Skin texture frequency pattern is atypical for a real photograph",
         }
 
+        # ── Zone → explanation mapping (Authentic) ─────────────────────────────
+        real_explanations = {
+            "forehead":    "Natural skin texture gradients and pore patterns in the forehead",
+            "eye_region":  "Eye region displays high-fidelity anatomical consistency and natural reflections",
+            "nose_bridge": "Nose-bridge geometry is structurally consistent with natural facial anatomy",
+            "cheeks":      "Cheek skin texture exhibits realistic micro-fluctuations and texture distribution",
+            "mouth_chin":  "Mouth area shows sharp, natural boundaries with no compositing artifacts",
+            "jaw_line":    "Jaw-line and chin boundaries are natural with seamless blending to background",
+            "skin_texture":"Skin texture frequency spectrum matches natural photographic standards",
+        }
+
         reasons = []
-        if prediction in ("Deepfake", "Undetermined / Potential Deepfake"):
+        is_fake = prediction in ("Deepfake", "Undetermined / Potential Deepfake")
+
+        if is_fake:
             for zone_name, mean_val in sorted_zones:
                 if mean_val >= threshold:
                     reasons.append(zone_explanations.get(zone_name, f"Anomaly in {zone_name} region"))
@@ -454,22 +477,39 @@ class DeepfakeDetector:
             if not reasons:
                 reasons.append("Neural network detected subtle generation artifacts")
 
-            # Additional high-confidence reason
             if confidence >= 0.85:
                 reasons.append(f"High-confidence detection ({confidence*100:.0f}%) — strong artifact signal")
         else:
-            reasons.append("No significant generation artifacts detected")
+            # Provide positive reasons for authenticity
+            for zone_name, mean_val in sorted_zones:
+                if mean_val >= 0.4: # Lower threshold for "Authentic" highlights
+                    reasons.append(real_explanations.get(zone_name, f"Natural features in {zone_name}"))
+                if len(reasons) >= 3:
+                    break
+            
+            if not reasons:
+                reasons.append("No significant generation artifacts detected")
+            
             if confidence >= 0.8:
                 reasons.append(f"High authenticity confidence ({confidence*100:.0f}%)")
 
-        # Global activation summary
+        # Global activation summary — Ensure it aligns with prediction
         global_mean = float(np.mean(cam))
-        if global_mean > 0.55:
-            xai_summary = "Widespread facial artifacts — consistent with full face replacement (e.g. FaceSwap)"
-        elif global_mean > 0.35:
-            xai_summary = "Localized artifacts — consistent with face reenactment (e.g. DeepFaceLab)"
+        
+        if is_fake:
+            if global_mean > 0.55:
+                xai_summary = "Widespread facial artifacts — consistent with full face replacement (e.g. FaceSwap)"
+            elif global_mean > 0.35:
+                xai_summary = "Localized artifacts — consistent with face reenactment (e.g. DeepFaceLab)"
+            else:
+                xai_summary = "Neural detection of subtle synthetic artifacts across facial features"
         else:
-            xai_summary = "Minimal activation — image appears predominantly authentic"
+            if confidence >= 0.85:
+                xai_summary = "Strong structural and textural integrity — highly characteristic of a real photograph"
+            elif global_mean < 0.25:
+                xai_summary = "Minimal neural activation — no discernible synthetic signatures detected"
+            else:
+                xai_summary = "Natural feature distribution — consistent with authentic digital capture"
 
         return {
             "reasons": reasons,

@@ -175,6 +175,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderXaiPanel(xai, prediction) {
         const panel = document.getElementById('xai-panel');
         panel.style.display = 'block';
+
+        const headerText = panel.querySelector('.xai-header span');
+        if (headerText) {
+            const isReal = prediction && (prediction.includes('Real') || prediction.toLowerCase().includes('likely'));
+            headerText.innerHTML = isReal ? '🧠 WHY IS THIS REAL?' : '🧠 WHY IS THIS FAKE?';
+        }
+
         document.getElementById('xai-summary').textContent = xai.xai_summary || '';
 
         const reasonsEl = document.getElementById('xai-reasons');

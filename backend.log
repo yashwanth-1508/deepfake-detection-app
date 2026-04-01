@@ -1,78 +1,60 @@
 INFO:     Will watch for changes in these directories: ['/Users/yashwanthgaddam/Desktop/deepfake-project']
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [1653] using StatReload
-INFO:     Started server process [1659]
+INFO:     Started reloader process [1316] using StatReload
+INFO:     Started server process [1319]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 Using device: mps
-Loaded base weights from /Users/yashwanthgaddam/Desktop/deepfake-project/model/weights/model.pth
 SUCCESS: Loaded fine-tuned BASE weights from /Users/yashwanthgaddam/Desktop/deepfake-project/model/weights/fine_tuned_base.pth
 SUCCESS: Loaded fine-tuned HEAD weights from /Users/yashwanthgaddam/Desktop/deepfake-project/model/weights/fine_tuned_head.pth
 CALIBRATION: Raw Average = 0.7567
 CALIBRATION: Raw Average = 0.8304
 CALIBRATION: Raw Average = 0.7936
-INFO:     127.0.0.1:49319 - "POST /detect HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49272 - "POST /detect HTTP/1.1" 200 OK
 WARNING:  StatReload detected changes in 'model/model.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [1659]
-INFO:     Started server process [2414]
+INFO:     Finished server process [1319]
+INFO:     Started server process [1498]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-WARNING:  StatReload detected changes in 'model/model.py'. Reloading...
+WARNING:  StatReload detected changes in 'verify_xai.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [2414]
-INFO:     Started server process [2438]
+INFO:     Finished server process [1498]
+INFO:     Started server process [1673]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-WARNING:  StatReload detected changes in 'model/model.py'. Reloading...
+WARNING:  StatReload detected changes in 'verify_xai.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [2438]
-INFO:     Started server process [2451]
+INFO:     Finished server process [1673]
+INFO:     Started server process [1766]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-WARNING:  StatReload detected changes in 'model/model.py'. Reloading...
+WARNING:  StatReload detected changes in 'verify_xai.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [2451]
-INFO:     Started server process [3396]
+INFO:     Finished server process [1766]
+INFO:     Started server process [1860]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 Using device: mps
-Loaded base weights from /Users/yashwanthgaddam/Desktop/deepfake-project/model/weights/model.pth
 SUCCESS: Loaded fine-tuned BASE weights from /Users/yashwanthgaddam/Desktop/deepfake-project/model/weights/fine_tuned_base.pth
 SUCCESS: Loaded fine-tuned HEAD weights from /Users/yashwanthgaddam/Desktop/deepfake-project/model/weights/fine_tuned_head.pth
 CALIBRATION: Raw Average = 0.7567
 CALIBRATION: Raw Average = 0.8304
 CALIBRATION: Raw Average = 0.7936
-INFO:     127.0.0.1:49825 - "POST /detect HTTP/1.1" 200 OK
-WARNING:  StatReload detected changes in 'model/model.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [3396]
-INFO:     Started server process [4009]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-WARNING:  StatReload detected changes in 'model/model.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [4009]
-INFO:     Started server process [4457]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-WARNING:  StatReload detected changes in 'model/model.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [4457]
-INFO:     Started server process [4863]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
+INFO:     127.0.0.1:49330 - "POST /detect HTTP/1.1" 200 OK
+CALIBRATION: Raw Average = 0.7567
+CALIBRATION: Raw Average = 0.8304
+CALIBRATION: Raw Average = 0.7936
+INFO:     127.0.0.1:49362 - "POST /detect HTTP/1.1" 200 OK
+CALIBRATION: Raw Average = 0.7567
+CALIBRATION: Raw Average = 0.8304
+CALIBRATION: Raw Average = 0.7936
+INFO:     127.0.0.1:49389 - "POST /detect HTTP/1.1" 200 OK

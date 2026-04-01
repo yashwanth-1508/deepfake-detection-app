@@ -34,3 +34,4 @@ dist/
 build/
 backend.log
 frontend.log
+verify_xai.py
