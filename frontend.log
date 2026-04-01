@@ -12,3 +12,6 @@
 ::1 - - [01/Apr/2026 17:41:07] "GET /hero-bg.png HTTP/1.1" 200 -
 ::1 - - [01/Apr/2026 17:41:08] code 404, message File not found
 ::1 - - [01/Apr/2026 17:41:08] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [01/Apr/2026 19:04:22] "GET / HTTP/1.1" 304 -
+::1 - - [01/Apr/2026 19:04:22] "GET /index.css HTTP/1.1" 304 -
+::1 - - [01/Apr/2026 19:04:22] "GET /script.js HTTP/1.1" 304 -
