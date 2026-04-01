@@ -32,3 +32,5 @@ model/weights/pytorchcv-*.whl
 node_modules/
 dist/
 build/
+backend.log
+frontend.log

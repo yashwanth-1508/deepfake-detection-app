@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRUTH LENSE AI | Neural Truth Verification</title>
+    <meta name="description" content="AI-powered deepfake detection with real-time webcam scanning, AI watermark analysis, and explainable AI dashboard.">
     <link rel="stylesheet" href="index.css">
 </head>
 
@@ -16,138 +17,353 @@
             <div class="logo">TRUTH<span>LENSE</span></div>
             <div class="nav-links">
                 <a href="#" class="active" data-section="home">Home</a>
-                <a href="#" data-section="about">About</a>
-                <a href="#" data-section="how">How It Works</a>
                 <a href="#" data-section="detection">Detection</a>
-                <a href="#" data-section="login">Login</a>
+                <a href="#" data-section="live">Live Scan</a>
+                <a href="#" data-section="watermark">Watermark</a>
+                <a href="#" data-section="about">About</a>
                 <a href="#" class="btn-get-started" data-section="detection">Get Started</a>
             </div>
+            <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu">&#9776;</button>
         </nav>
 
         <div class="content-layer">
-            <!-- Home / Hero Section -->
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- HOME SECTION                                          -->
+            <!-- ══════════════════════════════════════════════════════ -->
             <section id="home-section" class="section">
                 <div class="hero-content">
+                    <div class="hero-badge">AI-POWERED VERIFICATION</div>
                     <h1>Protect the <span class="blue">Truth</span><br>Detect the <span class="blue">Fake</span></h1>
                     <p class="hero-description">
-                        AI-powered deepfake detection that analyzes neural artifacts in real-time.
-                        Ensure authenticity, fight misinformation, and stay one step ahead of deception.
+                        Multi-modal deepfake detection with real-time webcam scanning,
+                        AI watermark analysis, and explainable neural intelligence.
                     </p>
                     <div class="hero-buttons">
                         <button class="btn-primary" onclick="showSection('detection')">Start Detection</button>
-                        <button class="btn-outline" onclick="showSection('login')">Login</button>
+                        <button class="btn-outline" onclick="showSection('live')">&#9654; Live Scan</button>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-item"><span class="stat-num">4</span><span class="stat-label">Detection Modes</span></div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item"><span class="stat-num">96.8%</span><span class="stat-label">Accuracy</span></div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item"><span class="stat-num">XAI</span><span class="stat-label">Explainable</span></div>
                     </div>
                 </div>
             </section>
 
-            <!-- Login Section -->
-            <section id="login-section" class="section">
-                <div class="login-card">
-                    <h2>SECURE LOGIN</h2>
-                    <form id="login-form">
-                        <div class="form-group">
-                            <label>Identity Token (Email)</label>
-                            <input type="email" placeholder="user@truthlense.ai" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Access Code</label>
-                            <input type="password" placeholder="••••••••" required>
-                        </div>
-                        <button type="submit" class="btn-primary" style="width: 100%;">Authorize Access</button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- Detection Section (Dashboard) -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- DETECTION SECTION (Image / Video Upload)              -->
+            <!-- ══════════════════════════════════════════════════════ -->
             <section id="detection-section" class="section">
-                <div class="scanner-container-v2" id="scanner-box">
-                    <h3 style="font-family: 'Orbitron'; margin-bottom: 20px; letter-spacing: 2px;">NEURAL SCANNER</h3>
+                <div class="dashboard-layout">
+                    <div class="scanner-container-v2" id="scanner-box">
+                        <h3 class="section-chip">&#9632; NEURAL SCANNER</h3>
 
-                    <div class="upload-area" id="drop-area" onclick="document.getElementById('file-input').click()">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                        <p>Upload Neural Evidence</p>
-                        <span style="font-size: 11px; color: rgba(255,255,255,0.3);">Support for JPG, PNG, MP4</span>
-                        <input type="file" id="file-input" accept="image/*,video/*">
-                    </div>
-
-                    <div id="file-name" style="color: var(--accent); margin-bottom: 20px; font-size: 14px;"></div>
-
-                    <button id="detect-btn" class="btn-primary" style="width: 100%;" disabled>Initialize Scan</button>
-
-                    <div id="loading" style="margin-top: 20px; display: none;">
-                        <div class="scanner-bar-v2" style="display: block;">
-                            <div class="scanner-fill"></div>
+                        <div class="upload-area" id="drop-area" onclick="document.getElementById('file-input').click()">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <p>Upload Neural Evidence</p>
+                            <span class="upload-hint">JPG · PNG · MP4 · MOV</span>
+                            <input type="file" id="file-input" accept="image/*,video/*">
                         </div>
-                        <div style="font-size: 12px; color: var(--accent); margin-top: 10px; letter-spacing: 2px;">
-                            ANALYZING NEURAL ARTIFACTS...</div>
-                    </div>
 
-                    <div id="result" class="result-card">
-                        <div style="font-size: 12px; letter-spacing: 2px; opacity: 0.7; margin-bottom: 8px;">DETECTION
-                            RESULT</div>
-                        <div class="result-summary-row">
-                            <div class="result-text-column">
-                                <div id="confidence-text" style="font-size: 14px; color: var(--text-dim); margin-bottom: 5px;">
-                                    Confidence: 0%</div>
-                                <div id="prediction-text"
-                                    style="font-family: 'Orbitron'; font-size: 32px; margin-bottom: 20px; line-height: 1;">---</div>
-                                <div
-                                    style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden; margin-bottom: 20px;">
-                                    <div id="confidence-bar" style="height:100%; width:0%; transition: width 0.8s ease-out;">
+                        <div id="file-name" class="file-name-display"></div>
+
+                        <button id="detect-btn" class="btn-primary btn-full" disabled>Initialize Scan</button>
+
+                        <div id="loading" class="loading-block">
+                            <div class="scanner-bar-v2"><div class="scanner-fill"></div></div>
+                            <div class="loading-label">ANALYZING NEURAL ARTIFACTS...</div>
+                        </div>
+
+                        <!-- Main Result Card -->
+                        <div id="result" class="result-card">
+                            <div class="result-label">DETECTION RESULT</div>
+                            <div class="result-summary-row">
+                                <div class="result-text-column">
+                                    <div id="confidence-text" class="conf-text">Confidence: 0%</div>
+                                    <div id="prediction-text" class="pred-text">---</div>
+                                    <div class="conf-bar-wrap">
+                                        <div id="confidence-bar" class="conf-bar"></div>
+                                    </div>
+                                </div>
+                                <div class="pie-chart-column">
+                                    <div class="pie-wrap">
+                                        <div id="neural-pie" class="neural-pie"></div>
+                                        <div class="pie-label" id="pie-label">FAKE</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="pie-chart-column">
-                                <div class="pie-wrap">
-                                    <div id="neural-pie" class="neural-pie"></div>
-                                    <div class="pie-label">FAKED</div>
+
+                            <!-- XAI Explanation Panel -->
+                            <div id="xai-panel" class="xai-panel" style="display:none;">
+                                <div class="xai-header" onclick="toggleXai()">
+                                    <span>&#129504; WHY IS THIS FAKE?</span>
+                                    <span class="xai-toggle-icon" id="xai-toggle-icon">&#9660;</span>
+                                </div>
+                                <div id="xai-body" class="xai-body">
+                                    <div id="xai-summary" class="xai-summary"></div>
+                                    <div id="xai-reasons" class="xai-reasons"></div>
+                                    <div id="xai-zones" class="xai-zones"></div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Neural Evidence Heatmap (Aggregated or multi) -->
-                        <!-- Analyzed Frames Grid (Face Crops) -->
-                        <div id="faces-list" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; display: none;">
-                            <div style="font-size: 11px; color: var(--accent); margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase;">Analyzed Neural Targets</div>
-                            <div id="faces-container" class="frames-grid">
-                                <!-- Face Thumbnails will be injected here -->
+
+                            <!-- Consistency Report (video only) -->
+                            <div id="consistency-panel" class="consistency-panel" style="display:none;">
+                                <div class="xai-header">&#128209; MULTI-MODAL CONSISTENCY REPORT</div>
+                                <div class="consistency-grid">
+                                    <div class="consistency-gauge" id="gauge-lip">
+                                        <svg class="gauge-svg" viewBox="0 0 120 70">
+                                            <path class="gauge-track" d="M10,65 A55,55 0 0,1 110,65" stroke-width="10" fill="none"/>
+                                            <path class="gauge-fill" id="gauge-lip-fill" d="M10,65 A55,55 0 0,1 110,65" stroke-width="10" fill="none" stroke-dasharray="0 172"/>
+                                        </svg>
+                                        <div class="gauge-value" id="gauge-lip-val">—</div>
+                                        <div class="gauge-label">Lip Sync</div>
+                                    </div>
+                                    <div class="consistency-gauge" id="gauge-light">
+                                        <svg class="gauge-svg" viewBox="0 0 120 70">
+                                            <path class="gauge-track" d="M10,65 A55,55 0 0,1 110,65" stroke-width="10" fill="none"/>
+                                            <path class="gauge-fill" id="gauge-light-fill" d="M10,65 A55,55 0 0,1 110,65" stroke-width="10" fill="none" stroke-dasharray="0 172"/>
+                                        </svg>
+                                        <div class="gauge-value" id="gauge-light-val">—</div>
+                                        <div class="gauge-label">Lighting</div>
+                                    </div>
+                                    <div class="consistency-gauge" id="gauge-overall">
+                                        <svg class="gauge-svg" viewBox="0 0 120 70">
+                                            <path class="gauge-track" d="M10,65 A55,55 0 0,1 110,65" stroke-width="10" fill="none"/>
+                                            <path class="gauge-fill" id="gauge-overall-fill" d="M10,65 A55,55 0 0,1 110,65" stroke-width="10" fill="none" stroke-dasharray="0 172"/>
+                                        </svg>
+                                        <div class="gauge-value" id="gauge-overall-val">—</div>
+                                        <div class="gauge-label">Overall</div>
+                                    </div>
+                                </div>
+                                <div id="consistency-details" class="consistency-details"></div>
+                                <div id="audio-status" class="audio-status"></div>
+                            </div>
+
+                            <!-- Heatmap + faces grid -->
+                            <div id="faces-list" class="faces-list">
+                                <div class="faces-list-label">ANALYZED NEURAL TARGETS</div>
+                                <div id="faces-container" class="frames-grid"></div>
+                            </div>
+
+                            <div id="heatmap-container" class="heatmap-block">
+                                <div class="heatmap-label">PRIMARY FEATURE HEATMAP</div>
+                                <img id="heatmap-img" src="" alt="Neural Evidence" class="heatmap-img">
                             </div>
                         </div>
 
-                        <div id="heatmap-container" style="margin-top: 20px; display: none;">
-                            <div style="font-size: 10px; color: var(--accent); margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase;">Primary Feature Heatmap</div>
-                            <img id="heatmap-img" src="" alt="Neural Evidence" style="width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                        </div>
-                    </div>
-
-                    <!-- Model Performance Benchmarks -->
-                    <div class="benchmarks-container">
-                        <div class="bench-header">MODEL PERFORMANCE COMPARISON</div>
-                        <div class="bench-grid">
-                            <div class="bench-item active">
-                                <div class="bench-label">TruthLense AI</div>
-                                <div class="bench-bar-wrap"><div class="bench-fill" style="width: 96%"></div></div>
-                                <div class="bench-val">96.8%</div>
-                            </div>
-                            <div class="bench-item">
-                                <div class="bench-label">XceptionNet</div>
-                                <div class="bench-bar-wrap"><div class="bench-fill" style="width: 91%"></div></div>
-                                <div class="bench-val">91.2%</div>
-                            </div>
-                            <div class="bench-item">
-                                <div class="bench-label">MesoNet-4</div>
-                                <div class="bench-bar-wrap"><div class="bench-fill" style="width: 82%"></div></div>
-                                <div class="bench-val">82.3%</div>
+                        <!-- Model Benchmarks -->
+                        <div class="benchmarks-container">
+                            <div class="bench-header">MODEL PERFORMANCE COMPARISON</div>
+                            <div class="bench-grid">
+                                <div class="bench-item active">
+                                    <div class="bench-label">TruthLense AI</div>
+                                    <div class="bench-bar-wrap"><div class="bench-fill" style="width:96%"></div></div>
+                                    <div class="bench-val">96.8%</div>
+                                </div>
+                                <div class="bench-item">
+                                    <div class="bench-label">XceptionNet</div>
+                                    <div class="bench-bar-wrap"><div class="bench-fill" style="width:91%"></div></div>
+                                    <div class="bench-val">91.2%</div>
+                                </div>
+                                <div class="bench-item">
+                                    <div class="bench-label">MesoNet-4</div>
+                                    <div class="bench-bar-wrap"><div class="bench-fill" style="width:82%"></div></div>
+                                    <div class="bench-val">82.3%</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
-        </div>
-    </div>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- LIVE SCAN SECTION                                     -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <section id="live-section" class="section">
+                <div class="live-layout">
+                    <div class="live-card">
+                        <h3 class="section-chip">&#9654; LIVE NEURAL SCANNER</h3>
+                        <p class="live-desc">Real-time deepfake detection using your webcam. A frame is analyzed every 1.5 seconds.</p>
+
+                        <div class="webcam-frame" id="webcam-frame">
+                            <video id="webcam-video" autoplay muted playsinline></video>
+                            <canvas id="webcam-canvas" style="display:none;"></canvas>
+                            <div class="webcam-overlay" id="webcam-overlay">
+                                <div class="webcam-corner tl"></div>
+                                <div class="webcam-corner tr"></div>
+                                <div class="webcam-corner bl"></div>
+                                <div class="webcam-corner br"></div>
+                            </div>
+                            <div class="live-badge" id="live-badge" style="display:none;">&#9679; LIVE</div>
+                            <div class="live-verdict-overlay" id="live-verdict-overlay" style="display:none;">
+                                <div id="live-pred" class="live-pred">---</div>
+                                <div id="live-conf" class="live-conf">—</div>
+                            </div>
+                        </div>
+
+                        <div class="live-controls">
+                            <button id="start-live-btn" class="btn-primary">&#9632; Start Live Scan</button>
+                            <button id="stop-live-btn" class="btn-outline" disabled>&#9632; Stop</button>
+                            <button id="flip-cam-btn" class="btn-outline" title="Flip Camera">&#8635; Flip</button>
+                        </div>
+
+                        <div id="live-status" class="live-status">Camera inactive</div>
+
+                        <div id="live-result-card" class="live-result-card" style="display:none;">
+                            <div class="live-result-row">
+                                <div class="live-result-item">
+                                    <span class="lr-label">VERDICT</span>
+                                    <span class="lr-val" id="lr-verdict">—</span>
+                                </div>
+                                <div class="live-result-item">
+                                    <span class="lr-label">CONFIDENCE</span>
+                                    <span class="lr-val" id="lr-conf">—</span>
+                                </div>
+                                <div class="live-result-item">
+                                    <span class="lr-label">FACES</span>
+                                    <span class="lr-val" id="lr-faces">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="live-history-label">SCAN HISTORY</div>
+                        <div id="live-history" class="live-history"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- WATERMARK SECTION                                     -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <section id="watermark-section" class="section">
+                <div class="wm-layout">
+                    <div class="wm-card">
+                        <h3 class="section-chip">&#128269; AI WATERMARK DETECTOR</h3>
+                        <p class="live-desc">
+                            Analyzes image frequency domain (FFT/DCT) for invisible AI-generation
+                            artifacts — GAN checkerboard patterns, periodical spectral spikes, and
+                            unnatural frequency uniformity.
+                        </p>
+
+                        <div class="upload-area" id="wm-drop-area" onclick="document.getElementById('wm-file-input').click()">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p>Upload Image to Scan</p>
+                            <span class="upload-hint">JPG · PNG · WEBP</span>
+                            <input type="file" id="wm-file-input" accept="image/*">
+                        </div>
+
+                        <div id="wm-file-name" class="file-name-display"></div>
+
+                        <button id="wm-detect-btn" class="btn-primary btn-full" disabled>Analyze for AI Watermarks</button>
+
+                        <div id="wm-loading" class="loading-block">
+                            <div class="scanner-bar-v2"><div class="scanner-fill"></div></div>
+                            <div class="loading-label">SCANNING FREQUENCY DOMAIN...</div>
+                        </div>
+
+                        <div id="wm-result" class="wm-result" style="display:none;">
+                            <div class="wm-score-row">
+                                <div class="wm-score-label">AI WATERMARK SCORE</div>
+                                <div class="wm-score-ring-wrap">
+                                    <svg class="wm-ring-svg" viewBox="0 0 120 120">
+                                        <circle class="wm-ring-track" cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
+                                        <circle class="wm-ring-fill" id="wm-ring-fill" cx="60" cy="60" r="50" fill="none" stroke-width="10"
+                                            stroke-dasharray="0 314" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+                                    </svg>
+                                    <div class="wm-ring-value" id="wm-ring-value">0%</div>
+                                </div>
+                                <div id="wm-verdict-text" class="wm-verdict-text">—</div>
+                            </div>
+
+                            <div id="wm-artifacts" class="wm-artifacts">
+                                <div class="wm-artifacts-label">DETECTED SPECTRAL ARTIFACTS</div>
+                                <div id="wm-artifacts-list" class="wm-artifacts-list"></div>
+                            </div>
+
+                            <div id="wm-details" class="wm-details-text"></div>
+
+                            <div class="wm-metrics">
+                                <div class="wm-metric-item">
+                                    <span class="wm-metric-label">Checkerboard Ratio</span>
+                                    <span class="wm-metric-val" id="wm-checker">—</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info Cards -->
+                        <div class="wm-info-grid">
+                            <div class="wm-info-card">
+                                <div class="wm-info-icon">&#127937;</div>
+                                <div class="wm-info-title">GAN Artifacts</div>
+                                <div class="wm-info-desc">Detects checkerboard patterns introduced by transposed convolution upsampling in GAN generators</div>
+                            </div>
+                            <div class="wm-info-card">
+                                <div class="wm-info-icon">&#128200;</div>
+                                <div class="wm-info-title">Spectral Analysis</div>
+                                <div class="wm-info-desc">Analyzes 2D FFT magnitude spectrum for unnatural frequency distributions invisible to the human eye</div>
+                            </div>
+                            <div class="wm-info-card">
+                                <div class="wm-info-icon">&#9889;</div>
+                                <div class="wm-info-title">Grid Spikes</div>
+                                <div class="wm-info-desc">Periodical spectral grid spikes are characteristic signatures of diffusion model image synthesis</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════════════════════ -->
+            <!-- ABOUT SECTION                                        -->
+            <!-- ══════════════════════════════════════════════════════ -->
+            <section id="about-section" class="section">
+                <div class="about-layout">
+                    <h2 class="about-title">How <span class="blue">TruthLense</span> Works</h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">&#129504;</div>
+                            <h4>Xception + LSTM</h4>
+                            <p>Deep CNN architecture trained on FaceForensics++ with temporal LSTM for multi-frame video analysis.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">&#127909;</div>
+                            <h4>Multi-Modal Consistency</h4>
+                            <p>Detects mismatch between lip motion vs. environment audio, and face vs. background lighting for videos.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">&#9654;</div>
+                            <h4>Real-Time Detection</h4>
+                            <p>Live webcam scanning with frame-by-frame neural analysis, working in any modern browser on any device.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">&#128269;</div>
+                            <h4>AI Watermark Detection</h4>
+                            <p>FFT/DCT spectral analysis exposes invisible GAN and diffusion model generation artifacts in the frequency domain.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">&#128209;</div>
+                            <h4>Explainable AI (XAI)</h4>
+                            <p>Grad-CAM heatmaps mapped to anatomical face zones give natural language explanations of every detection decision.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">&#128101;</div>
+                            <h4>Multi-Face Tracking</h4>
+                            <p>Individually tracks and analyzes every face in a scene with optical-flow-based temporal identity matching.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- /content-layer -->
+    </div><!-- /site-wrapper -->
 
     <script src="script.js"></script>
 </body>

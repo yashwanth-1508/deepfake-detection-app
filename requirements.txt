@@ -8,3 +8,5 @@ torchvision --index-url https://download.pytorch.org/whl/cpu
 opencv-python-headless
 numpy
 pytorchcv
+moviepy
+pillow
